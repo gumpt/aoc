@@ -20,7 +20,7 @@ fn main() {
     let iter = set.into_iter();
     for item in iter.combinations(3) {
         let (a, b, c) = (item[0], item[1], item[2]);
-        if (a + b + c) == 2020 {
+        if (a + b + c) == target {
             println!("PART 2: {}", a * b * c);
         }
     }
