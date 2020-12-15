@@ -1,27 +1,30 @@
-use regex::Regex;
+#[macro_use]
+extern crate lazy_static;
+use regex::{Captures, Regex};
 use std::io::{self, BufRead};
-use std::string::String;
 
 #[derive(Debug)]
-struct Line {
+struct Line<'a> {
     low: usize,
     high: usize,
-    c: String,
-    password: String,
+    c: &'a str,
+    password: &'a str,
 }
 
-impl Line {
-    fn new(line: &str) -> Line {
-        let re = Regex::new(r"(\d+)-(\d+) (.): (\w+)").unwrap();
-        let parts = re.captures(line).unwrap();
+impl Line<'_> {
+    fn parts(line: &str) -> Captures {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"(\d+)-(\d+) (.): (\w+)").unwrap();
+        }
+        return RE.captures(line).unwrap();
+    }
 
-        // TODO: Don't use std::String use a str or something I dunno?
-        // This runs real slow and I dunno if it's Rust strings or regexes!
+    fn new<'a>(parts: &'a Captures) -> Line<'a> {
         let l = Line {
             low: parts[1].parse().unwrap(),
             high: parts[2].parse().unwrap(),
-            c: parts[3].to_string(),
-            password: parts[4].to_string(),
+            c: &parts[3],
+            password: &parts[4],
         };
         // println!("{:?}", l);
         l
@@ -46,7 +49,9 @@ fn main() {
     let mut count_one = 0;
     let mut count_two = 0;
     for line in stdin.lock().lines() {
-        let l = Line::new(&line.unwrap());
+        let unwrapped = line.unwrap();
+        let parts = Line::parts(&unwrapped);
+        let l = Line::new(&parts);
         if l.is_valid_one() {
             count_one += 1;
         }
