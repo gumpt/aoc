@@ -4,16 +4,13 @@ use std::io::BufRead;
 fn search(elements: Vec<usize>) -> usize {
     let copy = elements.clone();
 
-    let mut splits = vec![];
+    let mut splits = vec![0];
     for (i, window) in copy.windows(2).enumerate() {
         let (first, second) = (window[0], window[1]);
         if second - first == 3 {
             splits.push(i);
         }
     }
-
-    splits.push(0);
-    splits.sort();
 
     let mut partitions = vec![];
     let copy = elements.clone();
@@ -28,11 +25,7 @@ fn search(elements: Vec<usize>) -> usize {
         partitions.push(partition);
     }
 
-    partitions.push(vec![*elements.last().unwrap()]);
-
     let r = partitions.iter().fold(1, |acc, partition| {
-        // println!("{:?}", partition);
-        // partitions.iter().for_each(|partition| {
         let mut body = partition.clone();
         let last = body.pop().unwrap();
         if body.is_empty() {
@@ -68,7 +61,7 @@ fn is_valid_set(permutation: &Vec<usize>, first: usize, last: usize) -> bool {
 
     for window in list.windows(2) {
         let (first, second) = (window[0] as i64, window[1] as i64);
-        match second - first.abs() {
+        match second - first {
             0..=3 => continue,
             _ => return false,
         }
@@ -103,6 +96,5 @@ fn main() {
     }
 
     println!("PART ONE: {}", count_three * count_one);
-
     println!("PART TWO: {}", search(elements));
 }
